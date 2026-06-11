@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Mandala-Explorer** is an interactive web application for exploring the *Treasury of Precious Qualities* (Yonten Dzo), a Buddhist philosophical text. The application presents the text as a clickable mandala visualization with an accompanying outline/chapter navigator and detailed reading panel for individual verses.
 
-- **Tech Stack**: Vue.js (3.x) single-page application
+- **Tech Stack**: React 18 (development build) + Babel Standalone — JSX is transformed in the browser at load time
 - **Deployment**: Single bundled HTML file (`index.html`)
 - **UI Modes**: Dark mode (default) and light mode toggle
 - **Text Source**: 13 chapters with full verse mappings
@@ -25,11 +25,11 @@ The application uses a custom bundler that embeds all source code, styles, fonts
 
 ### Application Structure (Runtime)
 
-The Vue.js app is initialized in the template and consists of:
+The React app is initialized in the template. Component sources are bundled as separate `text/babel` assets in the manifest (`MandalaExplorer.jsx`, `SabcheTreePanel.jsx`, `ZoomView.jsx`) plus an inline `text/babel` script holding the verse data, `ReadingPanel`, and `App`. The app consists of:
 
 - **Mandala Component**: Radial visualization with nested circles representing the text hierarchy (chapters → subsections → verses)
 - **Outline Panel**: Left sidebar tree view for chapter/verse navigation
-- **Reading Panel**: Right sidebar displaying selected verse text with attribution
+- **Reading Panel**: Docked right-hand column (≥1100px) or modal overlay (narrow screens) displaying the section and full chapter root text with the section's verse range highlighted; verses navigate back to the outline
 - **Breadcrumb Navigation**: Shows current position and allows quick navigation up the hierarchy
 - **Dark/Light Mode Toggle**: UI mode switcher affecting color scheme and typography
 
@@ -61,9 +61,9 @@ The bundled structure means editing is tricky. Most changes fall into these cate
 - Changes apply immediately on refresh
 
 **Feature changes** (clicking behavior, panels, etc.):
-- Vue component logic is embedded in the template
-- Changes to event handlers or component methods require finding the Vue code section
-- The code is minified/bundled, so use browser DevTools for inspection
+- React component logic lives in the gzipped `text/babel` manifest assets and the inline template script
+- Decompress the relevant manifest entry (base64 → gzip) to edit a component, then re-gzip and re-encode it
+- The code is bundled, so use browser DevTools for inspection
 
 ### Testing
 
@@ -85,9 +85,9 @@ No formal test suite exists. Verification is manual:
 
 ### Naming & Organization
 
-- **Data IDs**: Verses and chapters use internal identifiers (UUIDs in the bundler, numeric IDs in Vue data)
+- **Data IDs**: Verses and chapters use internal identifiers (UUIDs in the bundler, dotted section ids like `2.1.2` in the sa bche data)
 - **CSS Classes**: Scoped to mode (`[data-mode="mandala"]`, `[data-mode="scriptorium"]`)
-- **Component Names**: Follow Vue conventions (PascalCase for components)
+- **Component Names**: Follow React conventions (PascalCase for components)
 
 ### Domain Terminology
 
@@ -106,7 +106,7 @@ No formal test suite exists. Verification is manual:
 You can inspect the bundled structure in browser DevTools:
 1. Open `index.html` in browser
 2. Open DevTools → Sources tab
-3. Check `index.html` script content to see Vue code, styles, and data
+3. Check `index.html` script content to see React/JSX code, styles, and data
 
 ### Performance Considerations
 
@@ -116,8 +116,8 @@ You can inspect the bundled structure in browser DevTools:
 
 ### Known Patterns
 
-- **Verse Display**: Clicking mandala nodes or outline items updates the reading panel via Vue reactivity
-- **Navigation State**: Current selection tracked in Vue `data`, reflected in breadcrumbs and visual highlighting
+- **Verse Display**: Clicking mandala nodes or outline items updates the reading panel via React state; clicking a verse in the reading panel navigates the outline and mandala to the deepest section containing it
+- **Navigation State**: Current selection tracked in React state in `App` (`focusPath`, `zoomNode`), reflected in breadcrumbs and visual highlighting
 - **Mode Toggling**: CSS `[data-mode]` attribute controls styling; does not reload the page
 - **Asset References**: Font files and other resources referenced by UUID are resolved at runtime via blob URLs
 
