@@ -25,7 +25,7 @@ The application uses a custom bundler that embeds all source code, styles, fonts
 
 ### Application Structure (Runtime)
 
-The React app is initialized in the template. Component sources are bundled as separate `text/babel` assets in the manifest (`MandalaExplorer.jsx`, `SabcheTreePanel.jsx`, `ZoomView.jsx`) plus an inline `text/babel` script holding the verse data, `ReadingPanel`, and `App`. The app consists of:
+The React app is initialized in the template. Component sources are bundled as separate `text/babel` assets in the manifest (`MandalaExplorer.jsx`, `SabcheTreePanel.jsx`) plus an inline `text/babel` script holding the verse data, `ReadingPanel`, and `App`. (`ZoomView.jsx`, a hardcoded demo that was never rendered, has been removed from the bundle.) The app consists of:
 
 - **Mandala Component**: Radial visualization with nested circles representing the text hierarchy (chapters → subsections → verses)
 - **Outline Panel**: Left sidebar tree view for chapter/verse navigation
